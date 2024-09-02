@@ -1,0 +1,71 @@
+[tool.poetry.dependencies]
+python = ">=3.10.0,<3.12"
+beautifulsoup4 = "^4.9.3"
+requests = "^2.26.0"
+openai = "^0.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"import os
+import requests
+from bs4 import BeautifulSoup
+import openai
+
+# Load your API keys from environment variables
+REPLIT_API_PASSWORD = os.getenv("REPLIT_API_PASSWORD")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+openai.api_key = OPENAI_API_KEY
+
+def fetch_website_content(url):
+    response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception("Failed to fetch the website content")
+    return response.content
+
+def optimize_seo(content):
+    # Function to use AI (e.g., OpenAI) to provide SEO suggestions
+    prompt = f"Analyze and provide SEO suggestions for the following HTML content:\n\n{content}"
+    
+    response = openai.Completion.create(
+        engine="davinci-codex",
+        prompt=prompt,
+        max_tokens=150
+    )
+    suggestions = response.choices[0].text.strip()
+    return suggestions
+
+def main():
+    url = input("Enter the URL of the website to optimize: ")
+    try:
+        content = fetch_website_content(url)
+        soup = BeautifulSoup(content, 'html.parser')
+        optimized_suggestions = optimize_seo(soup.prettify())
+        print("SEO Optimization Suggestions:")
+        print(optimized_suggestions)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+if __name__ == "__main__":
+    main()[tool.poetry]
+name = "python-template"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.10.0,<3.12"
+
+[tool.pyright]
+# https://github.com/microsoft/pyright/blob/main/docs/configuration.md
+useLibraryCodeForTypes = true
+exclude = [".cache"]
+
+[tool.ruff]
+# https://beta.ruff.rs/docs/configuration/
+select = ['E', 'W', 'F', 'I', 'B', 'C4', 'ARG', 'SIM']
+ignore = ['W291', 'W292', 'W293']
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
